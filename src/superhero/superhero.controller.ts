@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, HttpStatus, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  HttpStatus,
+  HttpCode,
+  UsePipes,
+  ValidationPipe,
+  BadRequestException
+} from '@nestjs/common';
 import { SuperheroService } from './superhero.service';
 import { Superhero, CreateSuperheroDto } from './superhero.interface';
 
@@ -8,8 +18,16 @@ export class SuperheroController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createSuperheroDto: CreateSuperheroDto): Superhero {
-      return this.superheroService.create(createSuperheroDto);
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      exceptionFactory: (errors) => {
+        return new BadRequestException(errors);
+      },
+    }),
+  )
+  createSuperhero(@Body() createSuperheroDto: CreateSuperheroDto) {
+    return  this.superheroService.create(createSuperheroDto);;
   }
 
   @Get()

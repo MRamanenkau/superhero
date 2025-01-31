@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Superhero, CreateSuperheroDto } from './superhero.interface';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class SuperheroService {
@@ -8,7 +8,7 @@ export class SuperheroService {
 
   create(createSuperheroDto: CreateSuperheroDto): Superhero {
       const superhero: Superhero = {
-          id: uuidv4(),
+          id: uuid(),
           ...createSuperheroDto,
       };
 

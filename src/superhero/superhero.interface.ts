@@ -11,10 +11,10 @@ export class CreateSuperheroDto {
   name: string;
   power: string;
 
-  @IsInt() // Ensures the value is an integer
-  @Min(1)  // Ensures the value is at least 1
-  @Max(10) // Ensures the value is at most 10
+  static maxHumilityValue = 10;
+
+  @IsInt()
+  @Min(1)
+  @Max(CreateSuperheroDto.maxHumilityValue)
   humility: number;
 }
-
-
