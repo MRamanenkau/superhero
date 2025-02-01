@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   Body,
   HttpStatus,
   HttpCode,
@@ -27,11 +28,14 @@ export class SuperheroController {
     }),
   )
   createSuperhero(@Body() createSuperheroDto: CreateSuperheroDto) {
-    return  this.superheroService.create(createSuperheroDto);;
+    return this.superheroService.create(createSuperheroDto);
   }
 
   @Get()
-  findAll(): Superhero[] {
-      return this.superheroService.findAll();
+  findAll(
+    @Query('sortBy') sortBy?: keyof Superhero,
+    @Query('order') order?: 'asc' | 'desc'
+  ): Superhero[] {
+    return this.superheroService.findAll(sortBy, order);
   }
 }
