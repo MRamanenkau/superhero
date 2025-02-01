@@ -113,6 +113,38 @@ describe('SuperheroesController', () => {
     expect(mockSuperheroService.findAll).toBeCalled();
   });
 
+  it('findAll => should return superheroes sorted by humility in descending order', async () => {
+    const superheros = [
+      { id: '2', name: 'Batman', power: 'Intelligence', humility: 8 },
+      { id: '1', name: 'Superman', power: 'Flying', humility: 5 },
+    ];
+
+    mockSuperheroService.findAll.mockReturnValueOnce(superheros);
+
+    const response = await request(app.getHttpServer())
+      .get('/superhero?sortBy=humility&order=desc')
+      .expect(200);
+
+    expect(response.body).toEqual(superheros);
+    expect(mockSuperheroService.findAll).toBeCalledWith('humility', 'desc');
+  });
+
+  it('findAll => should return superheroes sorted by humility in ascending order', async () => {
+    const superheros = [
+      { id: '1', name: 'Superman', power: 'Flying', humility: 5 },
+      { id: '2', name: 'Batman', power: 'Intelligence', humility: 8 },
+    ];
+
+    mockSuperheroService.findAll.mockReturnValueOnce(superheros);
+
+    const response = await request(app.getHttpServer())
+      .get('/superhero?sortBy=humility&order=asc')
+      .expect(200);
+
+    expect(response.body).toEqual(superheros);
+    expect(mockSuperheroService.findAll).toBeCalledWith('humility', 'asc');
+  });
+
   afterAll(async () => {
     await app.close();
   });

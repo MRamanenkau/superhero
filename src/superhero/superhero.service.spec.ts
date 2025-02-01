@@ -14,7 +14,6 @@ const batman = {
   humility: 4,
 } as CreateSuperheroDto;
 
-
 describe('SuperheroService', () => {
   let service: SuperheroService;
 
@@ -50,6 +49,24 @@ describe('SuperheroService', () => {
       service.create(Object.assign(batman));
 
       expect(service.findAll()).toHaveLength(2);
+    });
+
+    it('should return superheroes sorted by humility in descending order', () => {
+      service.create(Object.assign(superman));
+      service.create(Object.assign(batman));
+
+      const sortedHeroes = service.findAll('humility', 'desc');
+      expect(sortedHeroes[0].name).toBe('Superman');
+      expect(sortedHeroes[1].name).toBe('Batman');
+    });
+
+    it('should return superheroes sorted by humility in ascending order', () => {
+      service.create(Object.assign(superman));
+      service.create(Object.assign(batman));
+
+      const sortedHeroes = service.findAll('humility', 'asc');
+      expect(sortedHeroes[0].name).toBe('Batman');
+      expect(sortedHeroes[1].name).toBe('Superman');
     });
   });
 });
