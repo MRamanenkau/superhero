@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SuperheroService } from './superhero.service';
-import { CreateSuperheroDto } from "./superhero.interface";
+import { CreateSuperheroDto } from './superhero.interface';
+import { SuperheroGateway } from './superhero.gateway';
 
 const superman = {
   name: 'Superman',
@@ -16,13 +17,27 @@ const batman = {
 
 describe('SuperheroService', () => {
   let service: SuperheroService;
+  let gateway: SuperheroGateway;
 
   beforeEach(async () => {
+    // Mocking the server object and its emit method
+    const mockServer = { emit: jest.fn() };
+
     const module: TestingModule = await Test.createTestingModule({
-      providers: [SuperheroService],
+      providers: [
+        SuperheroService,
+        {
+          provide: SuperheroGateway,
+          useValue: {
+            server: mockServer,  // Mocking server here
+            notifyClients: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     service = module.get<SuperheroService>(SuperheroService);
+    gateway = module.get<SuperheroGateway>(SuperheroGateway);
   });
 
   it('should be defined', () => {

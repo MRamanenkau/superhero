@@ -1,4 +1,4 @@
-import { IsInt, Min, Max } from 'class-validator';
+import {IsInt, Min, Max, IsOptional, IsString, IsIn} from 'class-validator';
 
 export interface Superhero {
   id: string;
@@ -17,4 +17,14 @@ export class CreateSuperheroDto {
   @Min(1)
   @Max(CreateSuperheroDto.maxHumilityValue)
   humility: number;
+}
+
+export class GetSuperheroesDto {
+  @IsOptional()
+  @IsString()
+  sortBy?: keyof Superhero;
+
+  @IsOptional()
+  @IsIn(['asc', 'desc'])
+  order?: 'asc' | 'desc';
 }
