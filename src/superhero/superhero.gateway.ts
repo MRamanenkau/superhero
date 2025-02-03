@@ -26,22 +26,18 @@ export class SuperheroGateway
     private readonly superheroService: SuperheroService,
   ) {}
 
-  // Called after the gateway is initialized
   afterInit(server: Server) {
     this.logger.log('Gateway initialized');
   }
 
-  // Called when a client connects
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
   }
 
-  // Called when a client disconnects
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
-  // Listen for 'getSuperheroes' messages from clients
   @SubscribeMessage('getSuperheroes')
   async handleGetSuperheroes(
     @MessageBody() data: GetSuperheroesDto,
@@ -56,9 +52,7 @@ export class SuperheroGateway
     return superheroes;
   }
 
-  // Use this method to notify all connected clients about updates
   notifyClients() {
-    const superheroes = this.superheroService.findAll('humility', 'desc');
-    this.server.emit('superheroesUpdated', superheroes);
+    this.server.emit('superheroesUpdated');
   }
 }
