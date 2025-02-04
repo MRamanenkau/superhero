@@ -31,121 +31,108 @@ describe('SuperheroesController', () => {
     await app.init();
   });
 
-  it('create => should create a new superhero with valid data', async () => {
-    // arrange
-    const createSuperheroDto = {
-      name: 'Superman',
-      power: 'Flying',
-      humility: 5,
-    };
+  describe('create', () => {
+    it(' => should create a new superhero with valid data', async () => {
+      // arrange
+      const createSuperheroDto = {
+        name: 'Superman',
+        power: 'Flying',
+        humility: 5,
+      };
 
-    const superhero = {
-      id: '123',
-      name: 'Superman',
-      power: 'Flying',
-      humility: 5,
-    };
+      const superhero = {
+        id: '123',
+        name: 'Superman',
+        power: 'Flying',
+        humility: 5,
+      };
 
-    mockSuperheroService.create.mockReturnValueOnce(superhero);
+      mockSuperheroService.create.mockReturnValueOnce(superhero);
 
-    // act
-    const response = await request(app.getHttpServer())
-      .post('/superhero')
-      .send(createSuperheroDto)
-      .expect(201);
+      // act
+      const response = await request(app.getHttpServer())
+        .post('/superhero')
+        .send(createSuperheroDto)
+        .expect(201);
 
-    // assert
-    expect(mockSuperheroService.create).toBeCalledWith(createSuperheroDto);
-    expect(response.body).toEqual(superhero);
-  });
+      // assert
+      expect(mockSuperheroService.create).toBeCalledWith(createSuperheroDto);
+      expect(response.body).toEqual(superhero);
+    });
+  })
 
+  describe('create', () => {
+    it('should return a validation error if humility is out of range', async () => {
+      // arrange
+      const createSuperheroDto: CreateSuperheroDto = {
+        name: 'Superman',
+        power: 'Flying',
+        humility: 11, // Invalid humility value
+      };
 
-  it('create => should return a validation error if humility is out of range', async () => {
-    // arrange
-    const createSuperheroDto: CreateSuperheroDto = {
-      name: 'Superman',
-      power: 'Flying',
-      humility: 11, // Invalid humility value
-    };
+      // act
+      const response = await request(app.getHttpServer())
+        .post('/superhero')
+        .send(createSuperheroDto)
+        .expect(400);
 
-    // act
-    const response = await request(app.getHttpServer())
-      .post('/superhero')
-      .send(createSuperheroDto)
-      .expect(400);
+      // assert
+      expect(response.body.message[0].constraints.max).toEqual(
+        `humility must not be greater than ${CreateSuperheroDto.maxHumilityValue}`,
+      );
+    });
 
-    // assert
-    expect(response.body.message[0].constraints.max).toEqual(
-      `humility must not be greater than ${CreateSuperheroDto.maxHumilityValue}`,
-    );
-  });
+    it('should return an empty array initially', async () => {
+      // act
+      const response = await request(app.getHttpServer())
+        .get('/superhero')
+        .expect(200);
 
-  it('findAll => should return an empty array initially', async () => {
-    // act
-    const response = await request(app.getHttpServer())
-      .get('/superhero')
-      .expect(200);
+      // assert
+      expect(response.body).toEqual({});
+    });
 
-    // assert
-    expect(response.body).toEqual({});
-  });
+    it('should return all saved superheroes', async () => {
+      // arrange
+      const superhero = {
+        id: '123',
+        name: 'Superman',
+        power: 'Flying',
+        humility: 5,
+      };
 
-  it('findAll => should return all saved superheroes', async () => {
-    // arrange
-    const superhero = {
-      id: '123',
-      name: 'Superman',
-      power: 'Flying',
-      humility: 5,
-    };
+      const superheros = [superhero, superhero];
 
-    const superheros = [superhero, superhero];
+      mockSuperheroService.findAll.mockReturnValueOnce(superheros);
 
-    mockSuperheroService.findAll.mockReturnValueOnce(superheros);
+      // act
+      const response = await request(app.getHttpServer())
+        .get('/superhero')
+        .expect(200);
 
-    // act
-    const response = await request(app.getHttpServer())
-      .get('/superhero')
-      .expect(200);
+      // assert
+      expect(response.body).toEqual(superheros);
+      expect(mockSuperheroService.findAll).toBeCalled();
+    });
 
-    // assert
-    expect(response.body).toEqual(superheros);
-    expect(mockSuperheroService.findAll).toBeCalled();
-  });
+    it('should return superheroes sorted by humility in descending order', async () => {
+      const superheros = [
+        { id: '2', name: 'Batman', power: 'Intelligence', humility: 8 },
+        { id: '1', name: 'Superman', power: 'Flying', humility: 5 },
+      ];
 
-  it('findAll => should return superheroes sorted by humility in descending order', async () => {
-    const superheros = [
-      { id: '2', name: 'Batman', power: 'Intelligence', humility: 8 },
-      { id: '1', name: 'Superman', power: 'Flying', humility: 5 },
-    ];
+      mockSuperheroService.findAll.mockReturnValueOnce(superheros);
 
-    mockSuperheroService.findAll.mockReturnValueOnce(superheros);
+      const response = await request(app.getHttpServer())
+        .get('/superhero?sortBy=humility&order=desc')
+        .expect(200);
 
-    const response = await request(app.getHttpServer())
-      .get('/superhero?sortBy=humility&order=desc')
-      .expect(200);
+      expect(response.body).toEqual(superheros);
+      expect(mockSuperheroService.findAll).toBeCalledWith('humility', 'desc');
+    });
 
-    expect(response.body).toEqual(superheros);
-    expect(mockSuperheroService.findAll).toBeCalledWith('humility', 'desc');
-  });
-
-  it('findAll => should return superheroes sorted by humility in ascending order', async () => {
-    const superheros = [
-      { id: '1', name: 'Superman', power: 'Flying', humility: 5 },
-      { id: '2', name: 'Batman', power: 'Intelligence', humility: 8 },
-    ];
-
-    mockSuperheroService.findAll.mockReturnValueOnce(superheros);
-
-    const response = await request(app.getHttpServer())
-      .get('/superhero?sortBy=humility&order=asc')
-      .expect(200);
-
-    expect(response.body).toEqual(superheros);
-    expect(mockSuperheroService.findAll).toBeCalledWith('humility', 'asc');
-  });
-
-  afterAll(async () => {
-    await app.close();
+    afterAll(async () => {
+      await app.close();
+    });
   });
 });

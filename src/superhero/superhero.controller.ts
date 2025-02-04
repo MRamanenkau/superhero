@@ -32,10 +32,10 @@ export class SuperheroController {
   }
 
   @Get()
-  findAll(
+  async findAll(
     @Query('sortBy') sortBy?: keyof Superhero,
     @Query('order') order?: 'asc' | 'desc'
-  ): Superhero[] {
-    return this.superheroService.findAll(sortBy, order);
+  ): Promise<Superhero[]> {
+    return await this.superheroService.findAll(sortBy, order);
   }
 }
