@@ -23,10 +23,8 @@ export class SuperheroService {
       ...createSuperheroDto,
     };
 
-    // Store superhero in Redis as a hash
     await this.client.hset(`superhero:${superhero.id}`, superhero);
 
-    // Add ID to a list for indexing
     await this.client.lpush('superheroes', superhero.id);
 
     this.superheroGateway.notifyClients();
