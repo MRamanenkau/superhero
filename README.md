@@ -4,9 +4,7 @@
 
 ### Client repository
 
-```
-https://github.com/MRamanenkau/superhero-client
-```
+[https://github.com/MRamanenkau/superhero-client](https://github.com/MRamanenkau/superhero-client)
 
 ### Project setup
 
